@@ -1,6 +1,6 @@
 package io.bartmilo.student.enrolment.app.repository;
 
-import io.bartmilo.student.enrolment.app.domain.StudentEntity;
+import io.bartmilo.student.enrolment.app.domain.entity.StudentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
