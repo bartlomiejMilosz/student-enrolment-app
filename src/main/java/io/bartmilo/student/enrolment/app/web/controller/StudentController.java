@@ -73,7 +73,7 @@ public class StudentController {
      * @return      The student with the specified ID.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<StudentDto> getStudentById(@PathVariable Long id) {
+    public ResponseEntity<StudentDto> findStudentById(@PathVariable Long id) {
         LOGGER.info("Attempting to find student with ID: {}", id);
 
         var studentEntity = studentService.findById(id)
@@ -95,7 +95,7 @@ public class StudentController {
      * @return All students in the database.
      */
     @GetMapping
-    public ResponseEntity<Page<StudentDto>> getAllStudents(@PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<Page<StudentDto>> findAllStudents(@PageableDefault(size = 10) Pageable pageable) {
         LOGGER.info(
                 "Request to fetch all students with page: {} and size: {}",
                 pageable.getPageNumber(),
@@ -110,18 +110,80 @@ public class StudentController {
                 .body(studentDtoPage);
     }
 
+    /**
+     * Updates the student with the specified ID.
+     * @param id           The ID of the student to update.
+     * @param studentDto   The student to update.
+     * @return             The updated student.
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<StudentEntity> updateStudent(
+    public ResponseEntity<StudentDto> fullUpdateStudent(
             @PathVariable Long id,
-            @RequestBody StudentEntity student
+            @RequestBody StudentDto studentDto
     ) {
-        try {
-            StudentEntity updatedStudent = studentService.partialUpdate(id, student);
-            return ResponseEntity.ok(updatedStudent);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+        LOGGER.info("Attempting to update student with ID: {}", id);
+
+        if (!studentService.isExists(id)) {
+            LOGGER.error("No student found with ID: {}", id);
+            return ResponseEntity
+                    .notFound()
+                    .build();
         }
+
+        LOGGER.info("Confirmed student exists, updating student with ID: {}", id);
+        studentDto.setId(id);
+
+        var studentEntity = studentMapper.mapTo(studentDto);
+        var savedStudentEntity = studentService.save(studentEntity);
+
+        LOGGER.info("Student with ID: {} updated successfully", id);
+        var savedStudentDto = studentMapper.mapFrom(savedStudentEntity);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .build()
+                .toUri();
+
+        return ResponseEntity
+                .ok()
+                .location(location)
+                .body(savedStudentDto);
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<StudentDto> partialUpdateStudent(
+            @PathVariable("id") Long id,
+            @RequestBody StudentDto studentDto
+    ) {
+        LOGGER.info("Attempting to update student with ID: {}", id);
+
+        if (!studentService.isExists(id)) {
+            LOGGER.error("No student found with ID: {}", id);
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
+
+        LOGGER.info("Confirmed student exists, updating student with ID: {}", id);
+        studentDto.setId(id);
+
+        var studentEntity = studentMapper.mapTo(studentDto);
+        var savedStudentEntity = studentService.partialUpdate(id, studentEntity);
+
+        LOGGER.info("Student with ID: {} updated successfully", id);
+        var savedStudentDto = studentMapper.mapFrom(savedStudentEntity);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .build()
+                .toUri();
+
+        return ResponseEntity
+                .ok()
+                .location(location)
+                .body(savedStudentDto);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
