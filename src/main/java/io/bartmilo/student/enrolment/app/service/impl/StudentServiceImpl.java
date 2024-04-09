@@ -1,6 +1,6 @@
 package io.bartmilo.student.enrolment.app.service.impl;
 
-import io.bartmilo.student.enrolment.app.domain.StudentEntity;
+import io.bartmilo.student.enrolment.app.domain.entity.StudentEntity;
 import io.bartmilo.student.enrolment.app.repository.StudentRepository;
 import io.bartmilo.student.enrolment.app.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;

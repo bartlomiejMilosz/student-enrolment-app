@@ -1,6 +1,6 @@
 package io.bartmilo.student.enrolment.app.service;
 
-import io.bartmilo.student.enrolment.app.domain.StudentEntity;
+import io.bartmilo.student.enrolment.app.domain.entity.StudentEntity;
 
 import java.util.List;
 import java.util.Optional;
