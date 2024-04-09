@@ -150,6 +150,12 @@ public class StudentController {
                 .body(savedStudentDto);
     }
 
+    /**
+     * Updates the student with the specified ID.
+     * @param id           The ID of the student to update.
+     * @param studentDto   The student to update.
+     * @return             The updated student.
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<StudentDto> partialUpdateStudent(
             @PathVariable("id") Long id,
@@ -185,13 +191,21 @@ public class StudentController {
     }
 
 
+    /**
+     * Deletes the student with the specified ID.
+     * @param id    The ID of the student to delete.
+     * @return      A ResponseEntity with OK 200 status if the deletion was successful
+     *              else Not Found 404 if a product with the specified ID is not found or
+     *              Internal Service Error 500 if an error occurs during deletion - served by ControllerAdvise
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
-        try {
-            studentService.delete(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        LOGGER.info("Deleting product with ID {}", id);
+        studentService.delete(id);
+
+        LOGGER.info("Student with ID: {} deleted successfully", id);
+        return ResponseEntity
+                .ok()
+                .build();
     }
 }
