@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Data
-// @ToString TODO
+@ToString(exclude = "studentEntity")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -58,5 +58,17 @@ public class BookEntity {
     )
     private LocalDateTime createdAt;
 
+    /* RELATIONS */
 
+    @ManyToOne(
+            cascade = CascadeType.PERSIST
+    )
+    @JoinColumn(
+            name = "student_id",
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(
+                    name = "book_student_id_fk"
+            )
+    )
+    private StudentEntity studentEntity;
 }
