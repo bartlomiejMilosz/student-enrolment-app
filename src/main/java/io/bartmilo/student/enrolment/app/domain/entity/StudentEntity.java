@@ -3,9 +3,12 @@ package io.bartmilo.student.enrolment.app.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Data
-// @ToString - TODO
+@ToString(exclude = "bookEntityList")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -59,4 +62,16 @@ public class StudentEntity {
                 nullable = false
         )
         private Integer age;
+
+        /* RELATIONS */
+
+        @OneToMany(
+                mappedBy = "studentEntity",
+                orphanRemoval = true,
+                cascade = {
+                        CascadeType.PERSIST,
+                        CascadeType.REMOVE
+                }
+        )
+        private List<BookEntity> bookEntityList = new ArrayList<>();
 }
