@@ -32,6 +32,13 @@ public interface StudentService {
     Optional<StudentEntity> findById(Long id);
 
     /**
+     * Returns boolean of student in the database with the specified ID. Checks whether the student exists in the database.
+     * @param id    ID of the student to check.
+     * @return      The requested student existence.
+     */
+    boolean isExists(Long id);
+
+    /**
      * Updates the specified student, identified by given ID.
      *
      * @param id            The ID of the student to update.

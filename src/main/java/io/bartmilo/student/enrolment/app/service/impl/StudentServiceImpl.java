@@ -51,6 +51,13 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean isExists(Long id) {
+        LOGGER.info("Check whether the student exists with id: {}", id);
+        return studentRepository.existsById(id);
+    }
+
+    @Override
     @Transactional
     public StudentEntity partialUpdate(Long id, StudentEntity studentEntity) {
         LOGGER.info("Make sure the student you want to update has specified id: {}", id);
