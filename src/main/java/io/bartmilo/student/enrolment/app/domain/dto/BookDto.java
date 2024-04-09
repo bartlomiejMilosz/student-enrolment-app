@@ -5,24 +5,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StudentDto {
+public class BookDto {
 
     private Long id;
 
-    private String firstName;
+    private String bookName;
 
-    private String lastName;
+    private String bookAuthor;
 
-    private String email;
-
-    private Integer age;
-
-    private List<BookDto> books;
+    private LocalDateTime createdAt;
 }
