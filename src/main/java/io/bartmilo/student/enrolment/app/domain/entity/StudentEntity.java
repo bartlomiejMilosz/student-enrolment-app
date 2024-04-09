@@ -1,4 +1,4 @@
-package io.bartmilo.student.enrolment.app.domain;
+package io.bartmilo.student.enrolment.app.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
