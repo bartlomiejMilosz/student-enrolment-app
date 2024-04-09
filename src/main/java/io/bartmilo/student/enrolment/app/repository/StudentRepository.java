@@ -3,12 +3,19 @@ package io.bartmilo.student.enrolment.app.repository;
 import io.bartmilo.student.enrolment.app.domain.entity.StudentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
+@Repository
+public interface StudentRepository extends
+        CrudRepository<StudentEntity, Long>,
+        PagingAndSortingRepository<StudentEntity, Long>
+{
     @Query("SELECT s FROM Student s WHERE s.email = ?1")
     Optional<StudentEntity> findStudentByEmail(String email);
 
