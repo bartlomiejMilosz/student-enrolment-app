@@ -11,11 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Spliterator;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -54,7 +50,7 @@ public class StudentServiceImpl implements StudentService {
     @Transactional(readOnly = true)
     public boolean isExists(Long id) {
         LOGGER.info("Check whether the student exists with id: {}", id);
-        return studentRepository.existsById(id);
+        return !studentRepository.existsById(id);
     }
 
     @Override

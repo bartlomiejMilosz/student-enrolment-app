@@ -14,12 +14,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/students")
@@ -42,7 +39,7 @@ public class StudentController {
      */
     @PostMapping
     public ResponseEntity<StudentDto> saveStudent(@RequestBody StudentDto studentDto) {
-        LOGGER.info("Mapping student {} to dto", studentDto);
+        LOGGER.info("Mapping student {} to dt  o", studentDto);
         var studentEntity = studentMapper.mapTo(studentDto);
 
         LOGGER.info(
@@ -123,7 +120,7 @@ public class StudentController {
     ) {
         LOGGER.info("Attempting to update student with ID: {}", id);
 
-        if (!studentService.isExists(id)) {
+        if (studentService.isExists(id)) {
             LOGGER.error("No student found with ID: {}", id);
             return ResponseEntity
                     .notFound()
@@ -163,7 +160,7 @@ public class StudentController {
     ) {
         LOGGER.info("Attempting to update student with ID: {}", id);
 
-        if (!studentService.isExists(id)) {
+        if (studentService.isExists(id)) {
             LOGGER.error("No student found with ID: {}", id);
             return ResponseEntity
                     .notFound()
