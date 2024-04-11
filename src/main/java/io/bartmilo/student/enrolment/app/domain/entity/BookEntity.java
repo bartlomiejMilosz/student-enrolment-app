@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
-@ToString(exclude = "studentEntity")
+@ToString(exclude = "rentalEntityList")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -77,15 +79,13 @@ public class BookEntity {
 
     /* RELATIONS */
 
-    @ManyToOne(
-            cascade = CascadeType.PERSIST
+    @OneToMany(
+            mappedBy = "bookEntity",
+            orphanRemoval = true,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.REMOVE
+            }
     )
-    @JoinColumn(
-            name = "student_id",
-            referencedColumnName = "id",
-            foreignKey = @ForeignKey(
-                    name = "book_student_id_fk"
-            )
-    )
-    private StudentEntity studentEntity;
+    private List<RentalEntity> rentalEntityList = new ArrayList<>();
 }
