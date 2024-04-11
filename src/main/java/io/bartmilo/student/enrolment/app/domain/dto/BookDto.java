@@ -15,9 +15,13 @@ public class BookDto {
 
     private Long id;
 
-    private String bookName;
-
     private String bookAuthor;
 
+    private String title;
+
+    private String isbn;
+
     private LocalDateTime createdAt;
+
+    private Integer stock;
 }

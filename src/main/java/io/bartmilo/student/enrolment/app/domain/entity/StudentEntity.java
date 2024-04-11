@@ -74,4 +74,17 @@ public class StudentEntity {
                 }
         )
         private List<BookEntity> bookEntityList = new ArrayList<>();
+
+        public void addBook(BookEntity bookEntity) {
+                if (bookEntityList.isEmpty()) {
+                        bookEntityList = new ArrayList<>();
+                }
+                bookEntityList.add(bookEntity);
+                bookEntity.setStudentEntity(this);
+        }
+
+        public void removeBook(BookEntity bookEntity) {
+                bookEntityList.remove(bookEntity);
+                bookEntity.setStudentEntity(null);
+        }
 }
