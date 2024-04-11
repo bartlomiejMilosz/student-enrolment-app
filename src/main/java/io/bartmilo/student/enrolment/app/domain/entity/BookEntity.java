@@ -15,8 +15,12 @@ import java.time.LocalDateTime;
         name = "book",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "book_name_unique",
-                        columnNames = "book_name"
+                        name = "title_unique",
+                        columnNames = "title"
+                ),
+                @UniqueConstraint(
+                        name = "isbn_unique",
+                        columnNames = "isbn"
                 )
         }
 )
@@ -45,11 +49,18 @@ public class BookEntity {
     private String bookAuthor;
 
     @Column(
-            name = "book_name",
+            name = "title",
             nullable = false,
             columnDefinition = "TEXT"
     )
-    private String bookName;
+    private String title;
+
+    @Column(
+            name = "isbn",
+            nullable = false,
+            columnDefinition = "TEXT"
+    )
+    private String isbn;
 
     @Column(
             name = "created_at",
@@ -57,6 +68,12 @@ public class BookEntity {
             columnDefinition = "TIMESTAMP WITHOUT TIME ZONE"
     )
     private LocalDateTime createdAt;
+
+    @Column(
+            name = "stock",
+            nullable = true // stock can be null
+    )
+    private Integer stock;
 
     /* RELATIONS */
 
