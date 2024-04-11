@@ -8,7 +8,7 @@ import java.util.List;
 
 
 @Data
-@ToString(exclude = "bookEntityList")
+@ToString(exclude = "rentalEntityList")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -73,18 +73,5 @@ public class StudentEntity {
                         CascadeType.REMOVE
                 }
         )
-        private List<BookEntity> bookEntityList = new ArrayList<>();
-
-        public void addBook(BookEntity bookEntity) {
-                if (bookEntityList.isEmpty()) {
-                        bookEntityList = new ArrayList<>();
-                }
-                bookEntityList.add(bookEntity);
-                bookEntity.setStudentEntity(this);
-        }
-
-        public void removeBook(BookEntity bookEntity) {
-                bookEntityList.remove(bookEntity);
-                bookEntity.setStudentEntity(null);
-        }
+        private List<RentalEntity> rentalEntityList = new ArrayList<>();
 }
