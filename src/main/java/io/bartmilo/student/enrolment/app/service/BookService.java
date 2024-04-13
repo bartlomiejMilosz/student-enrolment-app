@@ -8,8 +8,6 @@ import java.util.Optional;
 
 public interface BookService {
 
-    /* SIMPLE CRUD OPERATIONS */
-
     /**
      * Saves the specified book to the database.
      *
