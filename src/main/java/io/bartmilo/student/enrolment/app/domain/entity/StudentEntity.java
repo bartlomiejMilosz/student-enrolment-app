@@ -8,7 +8,10 @@ import java.util.List;
 
 
 @Data
-@ToString(exclude = "rentalEntityList")
+@ToString(exclude = {
+        "studentIdCardEntity",
+        "rentalEntityList"
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -64,6 +67,13 @@ public class StudentEntity {
         private Integer age;
 
         /* RELATIONS */
+
+        @OneToOne(
+                mappedBy = "studentEntity",
+                orphanRemoval = true,
+                cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+        )
+        private StudentIdCardEntity studentIdCardEntity;
 
         @OneToMany(
                 mappedBy = "studentEntity",
