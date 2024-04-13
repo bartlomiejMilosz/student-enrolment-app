@@ -1,7 +1,9 @@
 package io.bartmilo.student.enrolment.app.service.impl;
 
 import io.bartmilo.student.enrolment.app.domain.entity.StudentEntity;
+import io.bartmilo.student.enrolment.app.domain.entity.StudentIdCardEntity;
 import io.bartmilo.student.enrolment.app.repository.StudentRepository;
+import io.bartmilo.student.enrolment.app.service.StudentIdCardService;
 import io.bartmilo.student.enrolment.app.service.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,15 +21,22 @@ public class StudentServiceImpl implements StudentService {
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentServiceImpl.class);
 
     private final StudentRepository studentRepository;
+    private final StudentIdCardService studentIdCardService;
 
     @Autowired
-    public StudentServiceImpl(StudentRepository studentRepository) {
+    public StudentServiceImpl(
+            StudentRepository studentRepository,
+            StudentIdCardService studentIdCardService
+    ) {
         this.studentRepository = studentRepository;
+        this.studentIdCardService = studentIdCardService;
     }
 
     @Override
     @Transactional
     public StudentEntity save(StudentEntity student) {
+        var idCard = studentIdCardService.generateStudentIdCard(student);
+        student.setStudentIdCardEntity(idCard);
         LOGGER.info("Save student to the database: {}", student);
         return studentRepository.save(student);
     }
