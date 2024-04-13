@@ -36,14 +36,14 @@ public class RentalEntity {
 
     @Column(
             name = "rented_at",
-            nullable = false,
+            nullable = true, // by default is set to .now()
             columnDefinition = "TIMESTAMP WITHOUT TIME ZONE"
     )
     private LocalDateTime rentedAt;
 
     @Column(
             name = "due_date",
-            nullable = false,
+            nullable = false, // should specify due date by hand
             columnDefinition = "TIMESTAMP WITHOUT TIME ZONE"
     )
     private LocalDateTime dueDate;
