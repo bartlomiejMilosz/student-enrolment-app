@@ -83,16 +83,18 @@ public class RentalServiceImpl implements RentalService {
     @Override
     @Transactional
     public RentalEntity returnBook(Long rentalId) {
-        RentalEntity rental = rentalRepository.findById(rentalId)
+        var rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new EntityNotFoundException("Rental not found with ID: " + rentalId));
 
         if (rental.getReturnedAt() != null) {
             throw new IllegalStateException("This book has already been returned.");
         }
 
-        BookEntity book = rental.getBookEntity();
+        LOGGER.info(String.valueOf(rental.getBookEntity().getStock()));
+        var book = rental.getBookEntity();
         book.setStock(book.getStock() + 1);  // Increment stock on return
         bookService.save(book);
+        LOGGER.info(String.valueOf(book.getStock()));
 
         rental.setReturnedAt(LocalDateTime.now());
         rentalRepository.save(rental);
