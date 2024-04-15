@@ -6,6 +6,7 @@ import io.bartmilo.student.enrolment.app.repository.StudentIdCardRepository;
 import io.bartmilo.student.enrolment.app.service.StudentIdCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StudentIdCardServiceImpl implements StudentIdCardService {
@@ -17,6 +18,7 @@ public class StudentIdCardServiceImpl implements StudentIdCardService {
     }
 
     @Override
+    @Transactional
     public StudentIdCardEntity generateStudentIdCard(StudentEntity studentEntity) {
         StudentIdCardEntity studentIdCard = StudentIdCardEntity.builder()
                 .cardNumber(generateCardNumber())
