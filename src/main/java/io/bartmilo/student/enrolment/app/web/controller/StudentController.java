@@ -114,6 +114,7 @@ public class StudentController {
      * @return             The updated student.
      */
     @PutMapping("/{id}")
+    // TODO: consider changing it to PATCH method
     public ResponseEntity<StudentDto> fullUpdateStudent(
             @PathVariable Long id,
             @RequestBody StudentDto studentDto
@@ -202,7 +203,7 @@ public class StudentController {
 
         LOGGER.info("Student with ID: {} deleted successfully", id);
         return ResponseEntity
-                .ok()
+                .noContent()
                 .build();
     }
 }

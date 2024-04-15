@@ -38,7 +38,13 @@ public class StudentServiceImpl implements StudentService {
         var idCard = studentIdCardService.generateStudentIdCard(student);
         student.setStudentIdCardEntity(idCard);
         LOGGER.info("Save student to the database: {}", student);
-        return studentRepository.save(student);
+
+        // TODO: keep it but consider
+        if (student.getId() != null && findById(student.getId()).isPresent()) {
+            return studentRepository.saveAndFlush(student); // Ensure merge behavior
+        } else {
+            return studentRepository.save(student); // New entity
+        }
     }
 
     @Override
