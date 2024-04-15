@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface StudentRepository extends
-        CrudRepository<StudentEntity, Long>,
-        PagingAndSortingRepository<StudentEntity, Long>
-{
+public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
     @Query("SELECT s FROM Student s WHERE s.email = ?1")
     Optional<StudentEntity> findStudentByEmail(String email);
 
