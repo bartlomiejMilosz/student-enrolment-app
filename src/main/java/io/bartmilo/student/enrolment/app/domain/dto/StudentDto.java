@@ -24,5 +24,7 @@ public class StudentDto {
 
     private Integer age;
 
+    private StudentIdCardDto studentIdCard;
+
     private List<BookDto> books;
 }

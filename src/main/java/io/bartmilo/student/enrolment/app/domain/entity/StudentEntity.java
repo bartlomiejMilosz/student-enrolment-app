@@ -6,9 +6,12 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Data
 @ToString(exclude = {
+        "studentIdCardEntity",
+        "rentalEntityList"
+})
+@EqualsAndHashCode(exclude = {
         "studentIdCardEntity",
         "rentalEntityList"
 })
@@ -71,17 +74,22 @@ public class StudentEntity {
         @OneToOne(
                 mappedBy = "studentEntity",
                 orphanRemoval = true,
-                cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+                cascade = {
+                        CascadeType.PERSIST,
+                        CascadeType.MERGE,
+                        CascadeType.REMOVE
+                }
         )
         private StudentIdCardEntity studentIdCardEntity;
 
         @OneToMany(
                 mappedBy = "studentEntity",
-                orphanRemoval = true,
-                cascade = {
+                orphanRemoval = true
+               /* cascade = {
                         CascadeType.PERSIST,
                         CascadeType.REMOVE
-                }
+                }*/
         )
         private List<RentalEntity> rentalEntityList = new ArrayList<>();
 }
+

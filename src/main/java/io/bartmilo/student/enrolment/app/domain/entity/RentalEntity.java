@@ -12,6 +12,12 @@ import java.time.LocalDateTime;
                 "studentEntity"
         }
 )
+@EqualsAndHashCode(
+        exclude = {
+                "bookEntity",
+                "studentEntity"
+        }
+)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

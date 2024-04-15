@@ -9,6 +9,7 @@ import java.util.List;
 
 @Data
 @ToString(exclude = "rentalEntityList")
+@EqualsAndHashCode(exclude = "rentalEntityList")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -81,11 +82,11 @@ public class BookEntity {
 
     @OneToMany(
             mappedBy = "bookEntity",
-            orphanRemoval = true,
-            cascade = {
+            orphanRemoval = true
+           /* cascade = {
                     CascadeType.PERSIST,
                     CascadeType.REMOVE
-            }
+            }*/
     )
     private List<RentalEntity> rentalEntityList = new ArrayList<>();
 }

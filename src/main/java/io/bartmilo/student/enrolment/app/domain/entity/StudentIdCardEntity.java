@@ -6,6 +6,7 @@ import lombok.*;
 
 @Data
 @ToString(exclude="studentEntity")
+@EqualsAndHashCode(exclude = "studentEntity")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -51,7 +52,10 @@ public class StudentIdCardEntity {
     /* RELATIONS */
 
     @OneToOne(
-            cascade = CascadeType.PERSIST,
+            /*cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },*/
             fetch = FetchType.EAGER
     )
     @JoinColumn(
