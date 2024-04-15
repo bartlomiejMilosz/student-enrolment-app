@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -63,9 +65,10 @@ public class BookController {
     @GetMapping("/{id}")
     public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
         LOGGER.info("Request to get book by ID: {}", id);
-        BookEntity book = bookService.findById(id).orElseThrow(() -> {
+        BookEntity book = bookService.findById(id)
+                .orElseThrow(() -> {
             LOGGER.error("Book not found with ID: {}", id);
-            return new EntityNotFoundException("Book not found with ID: " + id);
+            return new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with ID: " + id);
         });
 
         BookDto bookDto = bookMapper.mapFrom(book);
@@ -96,7 +99,7 @@ public class BookController {
     @PutMapping("/{id}")
     public ResponseEntity<BookDto> updateBook(@PathVariable Long id, @RequestBody BookDto bookDto) {
         LOGGER.info("Request to update book with ID: {}", id);
-        if (!bookService.isExists(id)) {
+        if (bookService.isExists(id)) {
             LOGGER.error("Attempted to update a non-existent book with ID: {}", id);
             return ResponseEntity.notFound().build();
         }
@@ -115,14 +118,14 @@ public class BookController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         LOGGER.info("Request to delete book with ID: {}", id);
-        if (!bookService.isExists(id)) {
+        if (bookService.isExists(id)) {
             LOGGER.error("Attempted to delete a non-existent book with ID: {}", id);
             return ResponseEntity.notFound().build();
         }
         bookService.delete(id);
         LOGGER.info("Book deleted successfully with ID: {}", id);
         return ResponseEntity
-                .ok()
+                .noContent()
                 .build();
     }
 }
