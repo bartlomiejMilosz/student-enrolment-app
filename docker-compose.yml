@@ -11,6 +11,14 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  student-enrolment-app:
+    image: bartmilo/student-enrolment-app:latest
+    depends_on:
+      - postgresdb
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresdb:5432/student-enrolment_db
 
 volumes:
   postgres_data:
