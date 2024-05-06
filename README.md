@@ -6,7 +6,7 @@ The Student Enrollment App is a sophisticated Java Spring application designed t
 
 ## UML Diagram
 
-![Dark Mode UML](enrolment_app_UML-dark.png)
+![Dark Mode UML](enrolment_app-UML-dark.png)
 
 ## Features
 
