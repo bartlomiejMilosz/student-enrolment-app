@@ -4,6 +4,10 @@
 
 The Student Enrollment App is a sophisticated Java Spring application designed to facilitate the management of student enrollments, book inventory, and rentals. It integrates seamlessly with PostgreSQL, leveraging Docker for easy setup and scalability. The application exposes several RESTful services, enabling users to interact with the system through well-defined endpoints for creating, updating, retrieving, and deleting records related to books, rentals, and students.
 
+## UML Diagram
+
+![Dark Mode UML](enrolment_app_UML-dark.png)
+
 ## Features
 
 - Manage book inventory.
@@ -134,3 +138,7 @@ Contributions to the Student Enrollment App are welcome. Please ensure that your
 - Keep descriptions clear and concise.
 - Include comments in your code where necessary.
 - Write tests for new features and ensure existing tests pass.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details.
