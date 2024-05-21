@@ -1,6 +1,9 @@
 package io.bartmilo.student.enrolment.app.service;
 
 import io.bartmilo.student.enrolment.app.TestDataUtil;
+import io.bartmilo.student.enrolment.app.domain.book.service.BookService;
+import io.bartmilo.student.enrolment.app.domain.rental.service.RentalService;
+import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

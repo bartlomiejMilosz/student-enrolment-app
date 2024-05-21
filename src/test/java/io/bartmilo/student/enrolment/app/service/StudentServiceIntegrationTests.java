@@ -1,8 +1,8 @@
 package io.bartmilo.student.enrolment.app.service;
 
 import io.bartmilo.student.enrolment.app.TestDataUtil;
-import io.bartmilo.student.enrolment.app.domain.entity.StudentEntity;
-import org.junit.jupiter.api.Disabled;
+import io.bartmilo.student.enrolment.app.domain.student.model.StudentEntity;
+import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

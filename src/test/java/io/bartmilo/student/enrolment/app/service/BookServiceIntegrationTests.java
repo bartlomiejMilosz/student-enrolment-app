@@ -1,7 +1,8 @@
 package io.bartmilo.student.enrolment.app.service;
 
 import io.bartmilo.student.enrolment.app.TestDataUtil;
-import io.bartmilo.student.enrolment.app.domain.entity.BookEntity;
+import io.bartmilo.student.enrolment.app.domain.book.model.BookEntity;
+import io.bartmilo.student.enrolment.app.domain.book.service.BookService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

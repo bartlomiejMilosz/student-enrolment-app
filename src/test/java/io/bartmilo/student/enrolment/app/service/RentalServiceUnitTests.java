@@ -1,17 +1,15 @@
 package io.bartmilo.student.enrolment.app.service;
 
 import io.bartmilo.student.enrolment.app.TestDataUtil;
-import io.bartmilo.student.enrolment.app.domain.entity.BookEntity;
-import io.bartmilo.student.enrolment.app.domain.entity.RentalEntity;
-import io.bartmilo.student.enrolment.app.domain.entity.StudentEntity;
-import io.bartmilo.student.enrolment.app.domain.entity.StudentIdCardEntity;
-import io.bartmilo.student.enrolment.app.repository.RentalRepository;
-import io.bartmilo.student.enrolment.app.service.impl.RentalServiceImpl;
+import io.bartmilo.student.enrolment.app.domain.book.service.BookService;
+import io.bartmilo.student.enrolment.app.domain.rental.model.RentalEntity;
+import io.bartmilo.student.enrolment.app.domain.student.model.StudentIdCardEntity;
+import io.bartmilo.student.enrolment.app.domain.rental.repository.RentalRepository;
+import io.bartmilo.student.enrolment.app.domain.rental.service.RentalServiceImpl;
+import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +18,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static io.bartmilo.student.enrolment.app.domain.entity.StudentIdCardEntity.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

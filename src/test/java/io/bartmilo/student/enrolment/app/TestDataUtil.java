@@ -1,7 +1,7 @@
 package io.bartmilo.student.enrolment.app;
 
-import io.bartmilo.student.enrolment.app.domain.entity.BookEntity;
-import io.bartmilo.student.enrolment.app.domain.entity.StudentEntity;
+import io.bartmilo.student.enrolment.app.domain.book.model.BookEntity;
+import io.bartmilo.student.enrolment.app.domain.student.model.StudentEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
