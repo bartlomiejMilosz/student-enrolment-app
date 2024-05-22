@@ -1,5 +1,6 @@
 package io.bartmilo.student.enrolment.app.handler.advice;
 
+import io.bartmilo.student.enrolment.app.domain.book.exception.BookNotFoundException;
 import io.bartmilo.student.enrolment.app.domain.student.StudentController;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,16 +20,12 @@ public class ExceptionControllerAdvice {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionControllerAdvice.class);
 
-  private Map<String, Object> getResponseBody(
-      HttpServletRequest request, HttpStatus httpStatus, String massage) {
-    Map<String, Object> body = new LinkedHashMap<>();
-
-    body.put("timestamp", LocalDateTime.now());
-    body.put("status", httpStatus.value());
-    body.put("error", httpStatus.getReasonPhrase());
-    body.put("message", massage);
-    body.put("path", request.getRequestURI());
-    return body;
+  @ExceptionHandler(BookNotFoundException.class)
+  public ResponseEntity<Object> handleBookNotFoundException(
+      HttpServletRequest request, BookNotFoundException e) {
+    LOGGER.error("Book not found: {}", e.getMessage());
+    var body = getResponseBody(request, HttpStatus.NOT_FOUND, e.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
   }
 
   @ExceptionHandler(EntityNotFoundException.class)
@@ -57,5 +54,17 @@ public class ExceptionControllerAdvice {
     Map<String, Object> body =
         getResponseBody(request, HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.");
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+  }
+
+  private Map<String, Object> getResponseBody(
+      HttpServletRequest request, HttpStatus httpStatus, String massage) {
+    Map<String, Object> body = new LinkedHashMap<>();
+
+    body.put("timestamp", LocalDateTime.now());
+    body.put("status", httpStatus.value());
+    body.put("error", httpStatus.getReasonPhrase());
+    body.put("message", massage);
+    body.put("path", request.getRequestURI());
+    return body;
   }
 }
