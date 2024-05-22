@@ -12,7 +12,7 @@ import io.bartmilo.student.enrolment.app.domain.rental.model.RentalEntity;
 import io.bartmilo.student.enrolment.app.domain.rental.repository.RentalRepository;
 import io.bartmilo.student.enrolment.app.domain.rental.service.RentalService;
 import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
-import io.bartmilo.student.enrolment.app.util.ModelMapper;
+import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ class RentalControllerIntegrationTests {
 
   @Autowired private BookRepository bookRepository;
 
-  @Autowired private ModelMapper<RentalEntity, RentalDto> rentalModelMapper;
+  @Autowired private DomainMapper<RentalEntity, RentalDto> rentalModelMapper;
 
   @Test
   void testRentBook_ReturnsCreatedAndRentalDetails() throws Exception {

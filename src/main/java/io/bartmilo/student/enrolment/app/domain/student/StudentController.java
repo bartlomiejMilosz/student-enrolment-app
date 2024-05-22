@@ -2,7 +2,7 @@ package io.bartmilo.student.enrolment.app.domain.student;
 
 import io.bartmilo.student.enrolment.app.domain.student.model.StudentDto;
 import io.bartmilo.student.enrolment.app.domain.student.model.StudentEntity;
-import io.bartmilo.student.enrolment.app.util.ModelMapper;
+import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
@@ -24,10 +24,10 @@ public class StudentController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentController.class);
     private final StudentService studentService;
-    private final ModelMapper<StudentEntity, StudentDto> studentModelMapper;
+    private final DomainMapper<StudentEntity, StudentDto> studentModelMapper;
 
     @Autowired
-    public StudentController(StudentService studentService, ModelMapper<StudentEntity, StudentDto> studentModelMapper) {
+    public StudentController(StudentService studentService, DomainMapper<StudentEntity, StudentDto> studentModelMapper) {
         this.studentService = studentService;
         this.studentModelMapper = studentModelMapper;
     }

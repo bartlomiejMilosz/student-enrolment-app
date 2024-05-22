@@ -8,7 +8,7 @@ import io.bartmilo.student.enrolment.app.TestDataUtil;
 import io.bartmilo.student.enrolment.app.domain.student.model.StudentDto;
 import io.bartmilo.student.enrolment.app.domain.student.model.StudentEntity;
 import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
-import io.bartmilo.student.enrolment.app.util.ModelMapper;
+import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +32,7 @@ class StudentControllerIntegrationTests {
 
   @Autowired private StudentService studentService;
 
-  @Autowired private ModelMapper<StudentEntity, StudentDto> studentModelMapper;
+  @Autowired private DomainMapper<StudentEntity, StudentDto> studentModelMapper;
 
   @Autowired private EntityManager entityManager;
 

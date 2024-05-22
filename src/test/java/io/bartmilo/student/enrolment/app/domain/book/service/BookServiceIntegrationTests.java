@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.bartmilo.student.enrolment.app.TestDataUtil;
+import io.bartmilo.student.enrolment.app.domain.book.model.BookDto;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookEntity;
+import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,16 +21,23 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class BookServiceIntegrationTests {
 
-  @Autowired private BookService bookService;
+    private final BookService bookService;
+    private final DomainMapper domainMapper;
+
+    public BookServiceIntegrationTests(BookService bookService, DomainMapper domainMapper) {
+        this.bookService = bookService;
+        this.domainMapper = domainMapper;
+    }
 
   @Test
   void whenBookIsSaved_ThanCanBeRecalled() {
-    var book = TestDataUtil.createSingleTestBookEntity();
-    bookService.save(book);
+    var bookEntity = TestDataUtil.createSingleTestBookEntity();
+    var bookDto = domainMapper.convertEntityToDto(bookEntity, BookDto.class);
+    bookService.save(bookDto);
 
-    var result = bookService.findById(book.getId());
+    var result = bookService.findById(bookDto.id());
 
-    assertAll(() -> assertThat(result).isPresent(), () -> assertThat(result).contains(book));
+    assertAll(() -> assertThat(result).isNotNull(), () -> assertThat(result).isEqualTo(bookDto));
   }
 
   @Test

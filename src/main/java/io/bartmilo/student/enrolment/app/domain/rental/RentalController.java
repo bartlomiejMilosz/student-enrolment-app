@@ -2,7 +2,7 @@ package io.bartmilo.student.enrolment.app.domain.rental;
 
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalDto;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalEntity;
-import io.bartmilo.student.enrolment.app.util.ModelMapper;
+import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import io.bartmilo.student.enrolment.app.domain.rental.mapper.RentalModelMapper;
 import io.bartmilo.student.enrolment.app.domain.rental.service.RentalService;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class RentalController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RentalController.class);
 
     private final RentalService rentalService;
-    private final ModelMapper<RentalEntity, RentalDto> rentalModelMapper;
+    private final DomainMapper<RentalEntity, RentalDto> rentalModelMapper;
 
     @Autowired
     public RentalController(RentalService rentalService, RentalModelMapper rentalMapper) {

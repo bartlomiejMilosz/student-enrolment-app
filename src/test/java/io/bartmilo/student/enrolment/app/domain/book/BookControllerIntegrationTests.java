@@ -8,7 +8,7 @@ import io.bartmilo.student.enrolment.app.TestDataUtil;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookDto;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookEntity;
 import io.bartmilo.student.enrolment.app.domain.book.service.BookService;
-import io.bartmilo.student.enrolment.app.util.ModelMapper;
+import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ class BookControllerIntegrationTests {
 
   @Autowired private BookService bookService;
 
-  @Autowired private ModelMapper<BookEntity, BookDto> bookModelMapper;
+  @Autowired private DomainMapper<BookEntity, BookDto> bookModelMapper;
 
   @Test
   void testThatCreateBook_ReturnsHttpStatus201Created() throws Exception {
