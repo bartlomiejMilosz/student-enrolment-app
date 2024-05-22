@@ -1,6 +1,7 @@
 package io.bartmilo.student.enrolment.app.handler.advice;
 
 import io.bartmilo.student.enrolment.app.domain.book.exception.BookNotFoundException;
+import io.bartmilo.student.enrolment.app.domain.rental.exception.StudentNotFoundException;
 import io.bartmilo.student.enrolment.app.domain.student.StudentController;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,14 @@ public class ExceptionControllerAdvice {
   public ResponseEntity<Object> handleBookNotFoundException(
       HttpServletRequest request, BookNotFoundException e) {
     LOGGER.error("Book not found: {}", e.getMessage());
+    var body = getResponseBody(request, HttpStatus.NOT_FOUND, e.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+  }
+
+  @ExceptionHandler(StudentNotFoundException.class)
+  public ResponseEntity<Object> handleStudentNotFoundException(
+      HttpServletRequest request, StudentNotFoundException e) {
+    LOGGER.error("Student not found: {}", e.getMessage());
     var body = getResponseBody(request, HttpStatus.NOT_FOUND, e.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
   }
