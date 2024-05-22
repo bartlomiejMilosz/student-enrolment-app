@@ -2,11 +2,11 @@ package io.bartmilo.student.enrolment.app.domain.student.mapper;
 
 import io.bartmilo.student.enrolment.app.domain.student.model.StudentDto;
 import io.bartmilo.student.enrolment.app.domain.student.model.StudentEntity;
-import io.bartmilo.student.enrolment.app.util.ModelMapper;
+import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StudentModelMapper implements ModelMapper<StudentEntity, StudentDto> {
+public class StudentModelMapper implements DomainMapper<StudentEntity, StudentDto> {
     private final org.modelmapper.ModelMapper modelMapper;
 
     public StudentModelMapper(org.modelmapper.ModelMapper modelMapper) {
