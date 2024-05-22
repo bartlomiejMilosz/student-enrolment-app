@@ -3,11 +3,11 @@ package io.bartmilo.student.enrolment.app.domain.rental.service;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookDto;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookEntity;
 import io.bartmilo.student.enrolment.app.domain.book.service.BookService;
-import io.bartmilo.student.enrolment.app.domain.rental.exception.StudentNotFoundException;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalDto;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalEntity;
 import io.bartmilo.student.enrolment.app.domain.rental.repository.RentalRepository;
-import io.bartmilo.student.enrolment.app.domain.student.model.StudentIdCardEntity;
+import io.bartmilo.student.enrolment.app.domain.student.model.IdCardStatus;
+import io.bartmilo.student.enrolment.app.domain.student.model.StudentEntity;
 import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
 import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -45,17 +45,12 @@ public class RentalServiceImpl implements RentalService {
         bookId,
         studentId,
         dueDate);
-    var studentEntity =
-        studentService
-            .findById(studentId)
-            .orElseThrow(
-                () -> new StudentNotFoundException("Student not found with ID: " + studentId));
-    LOGGER.info("Student details retrieved: {}", studentEntity);
+    var studentDto = studentService.findById(studentId);
+    LOGGER.info("Student details retrieved: {}", studentDto);
 
     // Check the status of the student's ID card
-    if (studentEntity.getStudentIdCardEntity() == null
-        || studentEntity.getStudentIdCardEntity().getStatus()
-            != StudentIdCardEntity.CardStatus.ACTIVE) {
+    if (studentDto.studentIdCardDto() == null
+        || studentDto.studentIdCardDto().status() != IdCardStatus.ACTIVE) {
       LOGGER.warn("Attempt to rent with inactive ID card by student ID: {}", studentId);
       throw new IllegalStateException("Student's ID card is not active.");
     }
@@ -80,6 +75,7 @@ public class RentalServiceImpl implements RentalService {
     LOGGER.info("Updated book stock for book ID: {}. New stock: {}", bookId, rentedBookDto.stock());
 
     var rentedBookEntity = domainMapper.convertDtoToEntity(rentedBookDto, BookEntity.class);
+    var studentEntity = domainMapper.convertDtoToEntity(studentDto, StudentEntity.class);
 
     var rentalEntity = new RentalEntity();
     rentalEntity.setRentedAt(LocalDateTime.now());
