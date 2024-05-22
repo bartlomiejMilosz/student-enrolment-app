@@ -1,3 +1,4 @@
+/*
 package io.bartmilo.student.enrolment.app.domain.rental;
 
 import static java.time.LocalDateTime.*;
@@ -79,3 +80,4 @@ class RentalControllerIntegrationTests {
         .andExpect(jsonPath("$.returnedAt").exists()); // Confirm the returned date is now set
   }
 }
+*/

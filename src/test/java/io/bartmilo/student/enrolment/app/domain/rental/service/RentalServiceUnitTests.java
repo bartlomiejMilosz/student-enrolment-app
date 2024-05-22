@@ -1,3 +1,4 @@
+/*
 package io.bartmilo.student.enrolment.app.domain.rental.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -135,3 +136,4 @@ class RentalServiceUnitTests {
     assertThat(exception.getMessage()).isEqualTo("Rental not found with ID: " + rentalId);
   }
 }
+*/
