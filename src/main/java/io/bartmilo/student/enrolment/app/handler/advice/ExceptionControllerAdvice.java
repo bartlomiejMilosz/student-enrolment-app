@@ -1,7 +1,7 @@
 package io.bartmilo.student.enrolment.app.handler.advice;
 
 import io.bartmilo.student.enrolment.app.domain.book.exception.BookNotFoundException;
-import io.bartmilo.student.enrolment.app.domain.rental.exception.StudentNotFoundException;
+import io.bartmilo.student.enrolment.app.domain.student.exception.StudentNotFoundException;
 import io.bartmilo.student.enrolment.app.domain.student.StudentController;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
