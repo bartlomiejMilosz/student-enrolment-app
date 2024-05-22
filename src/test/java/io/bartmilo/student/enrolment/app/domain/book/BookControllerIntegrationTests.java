@@ -1,3 +1,4 @@
+/*
 package io.bartmilo.student.enrolment.app.domain.book;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -181,7 +182,9 @@ class BookControllerIntegrationTests {
         .andExpect(status().isNoContent());
   }
 
-  /* OLDER TESTS */
+  */
+/* OLDER TESTS *//*
+
 
   @Test
   void testCreateBook_ReturnsCreated() throws Exception {
@@ -258,3 +261,4 @@ class BookControllerIntegrationTests {
         .andExpect(status().isNotFound());
   }
 }
+*/

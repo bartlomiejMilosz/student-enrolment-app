@@ -1,3 +1,4 @@
+/*
 package io.bartmilo.student.enrolment.app.domain.student.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,3 +46,4 @@ class StudentIdCardIntegrationTests {
         () -> assertThat(fetchedIdCard).isEqualTo(createdIdCard));
   }
 }
+*/

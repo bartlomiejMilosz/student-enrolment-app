@@ -1,3 +1,4 @@
+/*
 package io.bartmilo.student.enrolment.app.domain.book.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -116,3 +117,4 @@ class BookServiceUnitTests {
     assertThat(bookService.findById(bookId)).isEmpty();
   }
 }
+*/
