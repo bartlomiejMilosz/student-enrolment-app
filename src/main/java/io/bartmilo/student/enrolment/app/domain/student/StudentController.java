@@ -1,9 +1,8 @@
 package io.bartmilo.student.enrolment.app.domain.student;
 
-import io.bartmilo.student.enrolment.app.domain.student.model.StudentDto;
-import io.bartmilo.student.enrolment.app.domain.student.model.StudentResponse;
+import io.bartmilo.student.enrolment.app.domain.student.mapper.StudentMapper;
+import io.bartmilo.student.enrolment.app.domain.student.model.*;
 import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
-import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,26 +19,26 @@ public class StudentController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudentController.class);
   private final StudentService studentService;
-  private final DomainMapper domainMapper;
+  private final StudentMapper studentMapper;
 
-  public StudentController(StudentService studentService, DomainMapper domainMapper) {
+  public StudentController(StudentService studentService, StudentMapper studentMapper) {
     this.studentService = studentService;
-    this.domainMapper = domainMapper;
+    this.studentMapper = studentMapper;
   }
 
   @PostMapping
-  public ResponseEntity<StudentResponse> createStudent(@RequestBody StudentDto studentDto) {
-    LOGGER.info("Request to create student: {}", studentDto);
+  public ResponseEntity<StudentResponse> createStudent(@RequestBody StudentRequest studentRequest) {
+    LOGGER.info("Request to create student: {}", studentRequest);
+    var studentDto = studentMapper.convertRequestToDto(studentRequest);
     var savedStudentDto = studentService.save(studentDto);
-    var studentResponse = domainMapper.convertDtoToResponse(savedStudentDto, StudentResponse.class);
 
     URI location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
             .buildAndExpand(savedStudentDto.id())
             .toUri();
-
     LOGGER.info("Student created successfully: {}", savedStudentDto);
+    var studentResponse = studentMapper.convertDtoToResponse(savedStudentDto);
     return ResponseEntity.created(location).body(studentResponse);
   }
 
@@ -47,7 +46,7 @@ public class StudentController {
   public ResponseEntity<StudentResponse> getStudentById(@PathVariable Long id) {
     LOGGER.info("Request to get student by ID: {}", id);
     var studentDto = studentService.findById(id);
-    var studentResponse = domainMapper.convertDtoToResponse(studentDto, StudentResponse.class);
+    var studentResponse = studentMapper.convertDtoToResponse(studentDto);
     LOGGER.info("Student retrieved successfully: {}", studentDto);
     return ResponseEntity.ok(studentResponse);
   }
@@ -57,8 +56,7 @@ public class StudentController {
       @PageableDefault(size = 10) Pageable pageable) {
     LOGGER.info("Request to get all students");
     var studentDtoPage = studentService.findAll(pageable);
-    var studentResponsePage =
-        studentDtoPage.map(dto -> domainMapper.convertDtoToResponse(dto, StudentResponse.class));
+    var studentResponsePage = studentDtoPage.map(studentMapper::convertDtoToResponse);
     LOGGER.info("Students retrieved with pagination");
     return ResponseEntity.ok(studentResponsePage);
   }
@@ -72,8 +70,7 @@ public class StudentController {
       return ResponseEntity.notFound().build();
     }
     var updatedStudentDto = studentService.save(studentDto);
-    var studentResponse =
-        domainMapper.convertDtoToResponse(updatedStudentDto, StudentResponse.class);
+    var studentResponse = studentMapper.convertDtoToResponse(updatedStudentDto);
     LOGGER.info("Student updated successfully: {}", updatedStudentDto);
     return ResponseEntity.ok(studentResponse);
   }
@@ -87,8 +84,7 @@ public class StudentController {
       return ResponseEntity.notFound().build();
     }
     var updatedStudentDto = studentService.partialUpdate(id, studentDto);
-    var studentResponse =
-        domainMapper.convertDtoToResponse(updatedStudentDto, StudentResponse.class);
+    var studentResponse = studentMapper.convertDtoToResponse(updatedStudentDto);
     LOGGER.info("Student partially updated successfully: {}", updatedStudentDto);
     return ResponseEntity.ok(studentResponse);
   }
