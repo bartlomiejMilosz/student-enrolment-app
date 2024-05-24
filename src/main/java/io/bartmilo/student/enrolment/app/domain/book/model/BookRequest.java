@@ -5,7 +5,6 @@ import lombok.*;
 
 @Builder
 public record BookRequest(
-    Long id,
     String bookAuthor,
     String title,
     String isbn,
