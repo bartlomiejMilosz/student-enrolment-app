@@ -1,6 +1,6 @@
 package io.bartmilo.student.enrolment.app.domain.student.model;
 
-import io.bartmilo.student.enrolment.app.domain.book.model.BookDto;
+import io.bartmilo.student.enrolment.app.domain.book.model.BookResponse;
 import java.util.List;
 import lombok.Builder;
 
@@ -11,5 +11,5 @@ public record StudentResponse(
     String lastName,
     String email,
     Integer age,
-    StudentIdCardDto studentIdCardDto,
-    List<BookDto> bookDtoList) {}
+    StudentIdCardResponse studentIdCardResponse,
+    List<BookResponse> bookResponseList) {}

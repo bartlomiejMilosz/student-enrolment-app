@@ -44,7 +44,7 @@ public class StudentEntity {
   @OneToOne(
       mappedBy = "studentEntity",
       orphanRemoval = true,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+      cascade = CascadeType.MERGE)
   private StudentIdCardEntity studentIdCardEntity;
 
   @OneToMany(mappedBy = "studentEntity", orphanRemoval = true)

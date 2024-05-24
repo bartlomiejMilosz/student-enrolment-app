@@ -4,4 +4,4 @@ import lombok.Builder;
 
 @Builder
 public record StudentIdCardResponse(
-        Long id, String cardNumber, IdCardStatus status, Long studentId) {}
+    Long id, String cardNumber, IdCardStatus status, Long studentId) {}
