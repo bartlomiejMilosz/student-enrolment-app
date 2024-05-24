@@ -1,10 +1,10 @@
 package io.bartmilo.student.enrolment.app.domain.book;
 
+import io.bartmilo.student.enrolment.app.domain.book.mapper.BookMapper;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookDto;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookRequest;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookResponse;
 import io.bartmilo.student.enrolment.app.domain.book.service.BookService;
-import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +21,11 @@ public class BookController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BookController.class);
   private final BookService bookService;
-  private final DomainMapper domainMapper;
+  private final BookMapper bookMapper;
 
-  public BookController(BookService bookService, DomainMapper domainMapper) {
+  public BookController(BookService bookService, BookMapper bookMapper) {
     this.bookService = bookService;
-    this.domainMapper = domainMapper;
+    this.bookMapper = bookMapper;
   }
 
   @GetMapping
@@ -34,8 +34,7 @@ public class BookController {
     LOGGER.info("Request to get all books");
     var bookDtoPage = bookService.findAll(pageable);
     LOGGER.info("Books retrieved with pagination");
-    var bookResponsePage =
-        bookDtoPage.map(bookDto -> domainMapper.convertDtoToResponse(bookDto, BookResponse.class));
+    var bookResponsePage = bookDtoPage.map(bookMapper::convertDtoToResponse);
     return ResponseEntity.ok(bookResponsePage);
   }
 
@@ -44,14 +43,14 @@ public class BookController {
     LOGGER.info("Request to get book by ID: {}", id);
     var bookDto = bookService.findById(id);
     LOGGER.info("Book retrieved successfully: {}", bookDto);
-    var bookResponse = domainMapper.convertDtoToResponse(bookDto, BookResponse.class);
+    var bookResponse = bookMapper.convertDtoToResponse(bookDto);
     return ResponseEntity.ok(bookResponse);
   }
 
   @PostMapping
   public ResponseEntity<BookResponse> createBook(@RequestBody BookRequest bookRequest) {
     LOGGER.info("Request to create book: {}", bookRequest);
-    var bookDto = domainMapper.convertRequestToDto(bookRequest, BookDto.class);
+    var bookDto = bookMapper.convertRequestToDto(bookRequest);
     var savedBookDto = bookService.save(bookDto);
 
     URI location =
@@ -60,7 +59,7 @@ public class BookController {
             .buildAndExpand(savedBookDto.id())
             .toUri();
     LOGGER.info("Book created successfully: {}", savedBookDto);
-    var bookResponse = domainMapper.convertDtoToResponse(savedBookDto, BookResponse.class);
+    var bookResponse = bookMapper.convertDtoToResponse(savedBookDto);
     return ResponseEntity.created(location).body(bookResponse);
   }
 
@@ -74,7 +73,7 @@ public class BookController {
     }
     var updatedBookDto = bookService.partialUpdate(id, bookDto);
     LOGGER.info("Book updated successfully: {}", updatedBookDto);
-    var bookResponse = domainMapper.convertDtoToResponse(updatedBookDto, BookResponse.class);
+    var bookResponse = bookMapper.convertDtoToResponse(updatedBookDto);
     return ResponseEntity.ok(bookResponse);
   }
 

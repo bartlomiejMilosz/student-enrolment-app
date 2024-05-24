@@ -1,10 +1,10 @@
 package io.bartmilo.student.enrolment.app.domain.book.service;
 
 import io.bartmilo.student.enrolment.app.domain.book.exception.BookNotFoundException;
+import io.bartmilo.student.enrolment.app.domain.book.mapper.BookMapper;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookDto;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookEntity;
 import io.bartmilo.student.enrolment.app.domain.book.repository.BookRepository;
-import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -16,20 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookServiceImpl implements BookService {
   private static final Logger LOGGER = LoggerFactory.getLogger(BookServiceImpl.class);
   private final BookRepository bookRepository;
-  private final DomainMapper domainMapper;
+  private final BookMapper bookMapper;
 
-  public BookServiceImpl(BookRepository bookRepository, DomainMapper domainMapper) {
+  public BookServiceImpl(BookRepository bookRepository, BookMapper bookMapper) {
     this.bookRepository = bookRepository;
-    this.domainMapper = domainMapper;
+    this.bookMapper = bookMapper;
   }
 
   @Override
   @Transactional
   public BookDto save(BookDto bookDto) {
     LOGGER.info("Saving book to the database: {}", bookDto);
-    var bookEntity = domainMapper.convertDtoToEntity(bookDto, BookEntity.class);
+    var bookEntity = bookMapper.convertDtoToEntity(bookDto);
     var savedBookEntity = bookRepository.save(bookEntity);
-    return domainMapper.convertEntityToDto(savedBookEntity, BookDto.class);
+    return bookMapper.convertEntityToDto(savedBookEntity);
   }
 
   @Override
@@ -37,7 +37,7 @@ public class BookServiceImpl implements BookService {
   public Page<BookDto> findAll(Pageable pageable) {
     LOGGER.info("Fetching all books with pagination");
     var bookEntityPage = bookRepository.findAll(pageable);
-    return bookEntityPage.map(entity -> domainMapper.convertEntityToDto(entity, BookDto.class));
+    return bookEntityPage.map(bookMapper::convertEntityToDto);
   }
 
   @Override
@@ -46,7 +46,7 @@ public class BookServiceImpl implements BookService {
     LOGGER.info("Finding book with ID: {}", id);
     return bookRepository
         .findById(id)
-        .map(bookEntity -> domainMapper.convertEntityToDto(bookEntity, BookDto.class))
+        .map(bookMapper::convertEntityToDto)
         .orElseThrow(() -> new BookNotFoundException("Book not found with ID: " + id));
   }
 
@@ -95,6 +95,6 @@ public class BookServiceImpl implements BookService {
 
     var updatedBook = bookRepository.save(existingBook);
     LOGGER.info("Updated book: {}", updatedBook);
-    return domainMapper.convertEntityToDto(updatedBook, BookDto.class);
+    return bookMapper.convertEntityToDto(updatedBook);
   }
 }
