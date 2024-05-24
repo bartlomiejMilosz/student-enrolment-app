@@ -1,15 +1,15 @@
 package io.bartmilo.student.enrolment.app.domain.rental.service;
 
+import io.bartmilo.student.enrolment.app.domain.book.mapper.BookMapper;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookDto;
-import io.bartmilo.student.enrolment.app.domain.book.model.BookEntity;
 import io.bartmilo.student.enrolment.app.domain.book.service.BookService;
+import io.bartmilo.student.enrolment.app.domain.rental.mapper.RentalMapper;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalDto;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalEntity;
 import io.bartmilo.student.enrolment.app.domain.rental.repository.RentalRepository;
+import io.bartmilo.student.enrolment.app.domain.student.mapper.StudentMapper;
 import io.bartmilo.student.enrolment.app.domain.student.model.IdCardStatus;
-import io.bartmilo.student.enrolment.app.domain.student.model.StudentEntity;
 import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
-import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -24,17 +24,23 @@ public class RentalServiceImpl implements RentalService {
   private final StudentService studentService;
   private final BookService bookService;
   private final RentalRepository rentalRepository;
-  private final DomainMapper domainMapper;
+  private final StudentMapper studentMapper;
+  private final BookMapper bookMapper;
+  private final RentalMapper rentalMapper;
 
   public RentalServiceImpl(
       StudentService studentService,
       BookService bookService,
       RentalRepository rentalRepository,
-      DomainMapper domainMapper) {
+      StudentMapper studentMapper,
+      RentalMapper rentalMapper,
+      BookMapper bookMapper) {
     this.studentService = studentService;
     this.bookService = bookService;
     this.rentalRepository = rentalRepository;
-    this.domainMapper = domainMapper;
+    this.studentMapper = studentMapper;
+    this.bookMapper = bookMapper;
+    this.rentalMapper = rentalMapper;
   }
 
   @Override
@@ -74,8 +80,8 @@ public class RentalServiceImpl implements RentalService {
     bookService.save(rentedBookDto); // Save the updated book stock
     LOGGER.info("Updated book stock for book ID: {}. New stock: {}", bookId, rentedBookDto.stock());
 
-    var rentedBookEntity = domainMapper.convertDtoToEntity(rentedBookDto, BookEntity.class);
-    var studentEntity = domainMapper.convertDtoToEntity(studentDto, StudentEntity.class);
+    var rentedBookEntity = bookMapper.convertDtoToEntity(rentedBookDto);
+    var studentEntity = studentMapper.convertDtoToEntity(studentDto);
 
     var rentalEntity = new RentalEntity();
     rentalEntity.setRentedAt(LocalDateTime.now());
@@ -87,7 +93,7 @@ public class RentalServiceImpl implements RentalService {
     LOGGER.info("Saving rental to the database.");
 
     var savedRentalEntity = rentalRepository.save(rentalEntity);
-    return domainMapper.convertEntityToDto(savedRentalEntity, RentalDto.class);
+    return rentalMapper.convertEntityToDto(savedRentalEntity);
   }
 
   @Override
@@ -103,7 +109,6 @@ public class RentalServiceImpl implements RentalService {
       throw new IllegalStateException("This book has already been returned.");
     }
 
-    LOGGER.info(String.valueOf(rentalEntity.getBookEntity().getStock()));
     var bookEntity = rentalEntity.getBookEntity();
     var returnedBookDto =
         new BookDto(
@@ -115,12 +120,11 @@ public class RentalServiceImpl implements RentalService {
             bookEntity.getStock() + 1);
 
     bookService.save(returnedBookDto);
-    LOGGER.info(String.valueOf(returnedBookDto.stock()));
 
     rentalEntity.setReturnedAt(LocalDateTime.now());
     rentalRepository.save(rentalEntity);
 
     LOGGER.info("Book returned successfully: {}", rentalEntity);
-    return domainMapper.convertEntityToDto(rentalEntity, RentalDto.class);
+    return rentalMapper.convertEntityToDto(rentalEntity);
   }
 }

@@ -1,9 +1,9 @@
 package io.bartmilo.student.enrolment.app.domain.rental;
 
+import io.bartmilo.student.enrolment.app.domain.rental.mapper.RentalMapper;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalRequest;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalResponse;
 import io.bartmilo.student.enrolment.app.domain.rental.service.RentalService;
-import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +19,11 @@ public class RentalController {
   private static final Logger LOGGER = LoggerFactory.getLogger(RentalController.class);
 
   private final RentalService rentalService;
-  private final DomainMapper domainMapper;
+  private final RentalMapper rentalMapper;
 
-  public RentalController(RentalService rentalService, DomainMapper domainMapper) {
+  public RentalController(RentalService rentalService, RentalMapper rentalMapper) {
     this.rentalService = rentalService;
-    this.domainMapper = domainMapper;
+    this.rentalMapper = rentalMapper;
   }
 
   @PostMapping
@@ -39,7 +39,7 @@ public class RentalController {
             .buildAndExpand(rentalDto.id())
             .toUri();
     LOGGER.info("Rental created successfully: {}", rentalDto);
-    var rentalResponse = domainMapper.convertDtoToResponse(rentalDto, RentalResponse.class);
+    var rentalResponse = rentalMapper.convertDtoToResponse(rentalDto);
     return ResponseEntity.created(location).body(rentalResponse);
   }
 
@@ -50,7 +50,7 @@ public class RentalController {
     var rentalDto = rentalService.returnBook(id);
 
     LOGGER.info("Book returned successfully for rental ID: {}", id);
-    var rentalResponse = domainMapper.convertDtoToResponse(rentalDto, RentalResponse.class);
+    var rentalResponse = rentalMapper.convertDtoToResponse(rentalDto);
     return ResponseEntity.status(HttpStatus.OK).body(rentalResponse);
   }
 }
