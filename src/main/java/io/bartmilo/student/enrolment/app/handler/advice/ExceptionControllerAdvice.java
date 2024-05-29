@@ -1,5 +1,6 @@
 package io.bartmilo.student.enrolment.app.handler.advice;
 
+import io.bartmilo.student.enrolment.app.domain.book.BookController;
 import io.bartmilo.student.enrolment.app.domain.book.exception.BookNotFoundException;
 import io.bartmilo.student.enrolment.app.domain.student.exception.StudentNotFoundException;
 import io.bartmilo.student.enrolment.app.domain.student.StudentController;
@@ -16,7 +17,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-@ControllerAdvice(assignableTypes = {StudentController.class})
+@ControllerAdvice(assignableTypes = {StudentController.class, BookController.class})
 public class ExceptionControllerAdvice {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionControllerAdvice.class);
