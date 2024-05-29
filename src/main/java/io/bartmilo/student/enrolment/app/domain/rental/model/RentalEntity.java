@@ -42,14 +42,14 @@ public class RentalEntity {
 
   /* RELATIONS */
 
-  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
   @JoinColumn(
       name = "student_id",
       referencedColumnName = "id",
       foreignKey = @ForeignKey(name = "rental_student_id_fk"))
   private StudentEntity studentEntity;
 
-  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
   @JoinColumn(
       name = "book_id",
       referencedColumnName = "id",

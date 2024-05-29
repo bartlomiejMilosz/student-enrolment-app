@@ -36,7 +36,7 @@ public class RentalController {
     URI location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
-            .buildAndExpand(rentalDto.id())
+            .buildAndExpand(rentalDto.getId())
             .toUri();
     LOGGER.info("Rental created successfully: {}", rentalDto);
     var rentalResponse = rentalMapper.convertDtoToResponse(rentalDto);
