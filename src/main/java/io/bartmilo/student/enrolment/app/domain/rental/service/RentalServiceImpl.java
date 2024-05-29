@@ -50,9 +50,9 @@ public class RentalServiceImpl implements RentalService {
         bookId,
         studentId,
         dueDate);
-
     var bookDto = bookService.decrementBookStock(bookId);
     var studentDto = studentService.findById(studentId);
+
     if (studentDto.studentIdCardDto().status() != IdCardStatus.ACTIVE) {
       throw new IllegalStateException("Student's ID card is not active.");
     }
@@ -86,7 +86,6 @@ public class RentalServiceImpl implements RentalService {
     var returnedBookId = rentalEntity.getBookEntity().getId();
     bookService.incrementBookStock(returnedBookId);
     rentalRepository.save(rentalEntity);
-
     LOGGER.info("Book returned successfully: {}", rentalEntity);
     return rentalMapper.convertEntityToDto(rentalEntity);
   }

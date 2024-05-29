@@ -32,8 +32,7 @@ public class RentalController {
     var rentalDto =
         rentalService.rentBook(
             rentalRequest.bookId(), rentalRequest.studentId(), rentalRequest.dueDate());
-
-    URI location =
+    var location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
             .buildAndExpand(rentalDto.getId())
@@ -46,9 +45,7 @@ public class RentalController {
   @PutMapping("/{id}")
   public ResponseEntity<RentalResponse> returnBook(@PathVariable Long id) {
     LOGGER.info("Initiating return process for rental ID: {}", id);
-
     var rentalDto = rentalService.returnBook(id);
-
     LOGGER.info("Book returned successfully for rental ID: {}", id);
     var rentalResponse = rentalMapper.convertDtoToResponse(rentalDto);
     return ResponseEntity.status(HttpStatus.OK).body(rentalResponse);

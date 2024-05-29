@@ -52,8 +52,7 @@ public class BookController {
     LOGGER.info("Request to create book: {}", bookRequest);
     var bookDto = bookMapper.convertRequestToDto(bookRequest);
     var savedBookDto = bookService.save(bookDto);
-
-    URI location =
+    var location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
             .buildAndExpand(savedBookDto.getId())

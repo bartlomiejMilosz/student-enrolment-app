@@ -1,9 +1,9 @@
 package io.bartmilo.student.enrolment.app.domain.student;
 
+import io.bartmilo.student.enrolment.app.domain.student.exception.StudentNotFoundException;
 import io.bartmilo.student.enrolment.app.domain.student.mapper.StudentMapper;
 import io.bartmilo.student.enrolment.app.domain.student.model.*;
 import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
-import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -31,8 +31,7 @@ public class StudentController {
     LOGGER.info("Request to create student: {}", studentRequest);
     var studentDto = studentMapper.convertRequestToDto(studentRequest);
     var savedStudentDto = studentService.save(studentDto);
-
-    URI location =
+    var location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
             .buildAndExpand(savedStudentDto.id())
@@ -65,10 +64,7 @@ public class StudentController {
   public ResponseEntity<StudentResponse> updateStudent(
       @PathVariable Long id, @RequestBody StudentDto studentDto) {
     LOGGER.info("Request to update student with ID: {}", id);
-    if (!studentService.exists(id)) {
-      LOGGER.error("Attempted to update a non-existent student with ID: {}", id);
-      return ResponseEntity.notFound().build();
-    }
+    checkIfTheStudentExists(id);
     var updatedStudentDto = studentService.save(studentDto);
     var studentResponse = studentMapper.convertDtoToResponse(updatedStudentDto);
     LOGGER.info("Student updated successfully: {}", updatedStudentDto);
@@ -79,10 +75,7 @@ public class StudentController {
   public ResponseEntity<StudentResponse> partialUpdateStudent(
       @PathVariable Long id, @RequestBody StudentDto studentDto) {
     LOGGER.info("Request to partially update student with ID: {}", id);
-    if (!studentService.exists(id)) {
-      LOGGER.error("Attempted to update a non-existent student with ID: {}", id);
-      return ResponseEntity.notFound().build();
-    }
+    checkIfTheStudentExists(id);
     var updatedStudentDto = studentService.partialUpdate(id, studentDto);
     var studentResponse = studentMapper.convertDtoToResponse(updatedStudentDto);
     LOGGER.info("Student partially updated successfully: {}", updatedStudentDto);
@@ -92,12 +85,16 @@ public class StudentController {
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
     LOGGER.info("Request to delete student with ID: {}", id);
-    if (!studentService.exists(id)) {
-      LOGGER.error("Attempted to delete a non-existent student with ID: {}", id);
-      return ResponseEntity.notFound().build();
-    }
+    checkIfTheStudentExists(id);
     studentService.delete(id);
     LOGGER.info("Student deleted successfully with ID: {}", id);
     return ResponseEntity.noContent().build();
+  }
+
+  private void checkIfTheStudentExists(Long id) {
+    if (!studentService.exists(id)) {
+      LOGGER.error("Attempted to update a non-existent student with ID: {}", id);
+      throw new StudentNotFoundException("Cannot update non-existing student");
+    }
   }
 }
