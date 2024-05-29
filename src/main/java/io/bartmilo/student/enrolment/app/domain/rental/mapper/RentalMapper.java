@@ -14,8 +14,12 @@ public interface RentalMapper {
 
   RentalMapper INSTANCE = Mappers.getMapper(RentalMapper.class);
 
+  @Mapping(source = "bookEntity.id", target = "bookId")
+  @Mapping(source = "studentEntity.id", target = "studentId")
   RentalDto convertEntityToDto(RentalEntity entity);
 
+  @Mapping(source = "bookId", target = "bookEntity.id")
+  @Mapping(source = "studentId", target = "studentEntity.id")
   RentalEntity convertDtoToEntity(RentalDto dto);
 
   @Mapping(target = "id", ignore = true)
