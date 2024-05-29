@@ -1,8 +1,6 @@
-version: '3.1'
-
 services:
   postgresdb:
-    image: postgres
+    image: postgres:16.3-alpine
     environment:
       POSTGRES_DB: student-enrolment_db
       POSTGRES_USER: postgres
@@ -11,14 +9,18 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
   student-enrolment-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: bartmilo/student-enrolment-app:latest
     depends_on:
       - postgresdb
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresdb:5432/student-enrolment_db
+      - SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdb:5432/student-enrolment_db
 
 volumes:
   postgres_data:
