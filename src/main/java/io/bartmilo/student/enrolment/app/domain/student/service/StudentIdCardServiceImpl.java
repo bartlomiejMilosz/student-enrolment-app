@@ -46,6 +46,7 @@ public class StudentIdCardServiceImpl implements StudentIdCardService {
             .studentEntity(studentEntity)
             .build();
     studentIdCardEntity = studentIdCardRepository.save(studentIdCardEntity);
+    LOGGER.info("STUDENT_ID_CARD_ENTITY: {}", studentIdCardEntity);
     return studentIdCardMapper.convertEntityToDto(studentIdCardEntity);
   }
 
