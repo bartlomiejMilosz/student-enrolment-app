@@ -1,4 +1,3 @@
-/*
 package io.bartmilo.student.enrolment.app.domain.book;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -6,10 +5,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.bartmilo.student.enrolment.app.TestDataUtil;
-import io.bartmilo.student.enrolment.app.domain.book.model.BookDto;
-import io.bartmilo.student.enrolment.app.domain.book.model.BookEntity;
+import io.bartmilo.student.enrolment.app.domain.book.mapper.BookMapper;
 import io.bartmilo.student.enrolment.app.domain.book.service.BookService;
-import io.bartmilo.student.enrolment.app.util.DomainMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +24,15 @@ import org.springframework.test.web.servlet.MockMvc;
 class BookControllerIntegrationTests {
 
   @Autowired private MockMvc mockMvc;
-
   @Autowired private ObjectMapper objectMapper;
-
+  @Autowired private BookMapper bookMapper;
   @Autowired private BookService bookService;
-
-  @Autowired private DomainMapper<BookEntity, BookDto> bookModelMapper;
 
   @Test
   void testThatCreateBook_ReturnsHttpStatus201Created() throws Exception {
     var bookEntity = TestDataUtil.createSingleTestBookEntity();
-    var bookDto = bookModelMapper.mapFrom(bookEntity);
-    String bookJson = objectMapper.writeValueAsString(bookDto);
+    var bookDto = bookMapper.convertEntityToDto(bookEntity);
+    var bookJson = objectMapper.writeValueAsString(bookDto);
 
     mockMvc
         .perform(post("/books").contentType(MediaType.APPLICATION_JSON).content(bookJson))
@@ -48,9 +42,9 @@ class BookControllerIntegrationTests {
   @Test
   void testThatCreateBook_ReturnsSavedBook() throws Exception {
     var bookEntity = TestDataUtil.createSingleTestBookEntity();
-    var bookDto = bookModelMapper.mapFrom(bookEntity);
+    var bookDto = bookMapper.convertEntityToDto(bookEntity);
     bookDto.setId(1L);
-    String bookJson = objectMapper.writeValueAsString(bookDto);
+    var bookJson = objectMapper.writeValueAsString(bookDto);
 
     mockMvc
         .perform(post("/books").contentType(MediaType.APPLICATION_JSON).content(bookJson))
@@ -70,8 +64,9 @@ class BookControllerIntegrationTests {
 
   @Test
   void testThatBookList_ReturnsListOfBooks() throws Exception {
-    var bookEntityList = TestDataUtil.createListOfTestBookEntities();
-    bookEntityList.forEach(bookService::save);
+    var bookEntityList = TestDataUtil.createListOfTestBookEntity();
+    var bookDtoList = bookEntityList.stream().map(bookMapper::convertEntityToDto).toList();
+    bookDtoList.forEach(bookService::save);
 
     mockMvc
         .perform(get("/books").contentType(MediaType.APPLICATION_JSON))
@@ -85,10 +80,11 @@ class BookControllerIntegrationTests {
   @Test
   void testThatGetBookReturnsHttpStatus200Ok_WhenBookExists() throws Exception {
     var bookEntity = TestDataUtil.createSingleTestBookEntity();
-    bookService.save(bookEntity);
+    var bookDto = bookMapper.convertEntityToDto(bookEntity);
+    var savedBookDto = bookService.save(bookDto);
 
     mockMvc
-        .perform(get("/books/{id}", bookEntity.getId()).contentType(MediaType.APPLICATION_JSON))
+        .perform(get("/books/{id}", savedBookDto.getId()).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
   }
 
@@ -102,13 +98,12 @@ class BookControllerIntegrationTests {
   @Test
   void testThatGetBookReturnsBook_WhenBookExists() throws Exception {
     var bookEntity = TestDataUtil.createSingleTestBookEntity();
-    bookEntity.setId(1L);
-    bookService.save(bookEntity);
-    var bookDto = bookModelMapper.mapFrom(bookEntity);
+    var bookDto = bookMapper.convertEntityToDto(bookEntity);
+    var savedBookDto = bookService.save(bookDto);
 
     mockMvc
-        .perform(get("/books/{id}", bookEntity.getId()).contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(bookDto.getId()))
+        .perform(get("/books/{id}", savedBookDto.getId()).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(savedBookDto.getId()))
         .andExpect(jsonPath("$.bookAuthor").value("George Orwell"))
         .andExpect(jsonPath("$.title").value("1984"))
         .andExpect(jsonPath("$.isbn").value("978-0451524935"))
@@ -118,8 +113,8 @@ class BookControllerIntegrationTests {
   @Test
   void testThatFullUpdateBook_ReturnsHttpStatus404NotFound_WhenNoBookExists() throws Exception {
     var bookEntity = TestDataUtil.createSingleTestBookEntity();
-    var bookDto = bookModelMapper.mapFrom(bookEntity);
-    String bookJson = objectMapper.writeValueAsString(bookDto);
+    var bookDto = bookMapper.convertEntityToDto(bookEntity);
+    var bookJson = objectMapper.writeValueAsString(bookDto);
 
     mockMvc
         .perform(put("/books/99").contentType(MediaType.APPLICATION_JSON).content(bookJson))
@@ -129,40 +124,41 @@ class BookControllerIntegrationTests {
   @Test
   void testThatFullUpdateBook_ReturnsHttpStatus200Ok_WhenBookExists() throws Exception {
     var bookEntity = TestDataUtil.createSingleTestBookEntity();
-    // trigger service to get student ID card
-    bookService.save(bookEntity);
-    var bookDto = bookModelMapper.mapFrom(bookEntity);
-    String bookJson = objectMapper.writeValueAsString(bookDto);
+    var bookDto = bookMapper.convertEntityToDto(bookEntity);
+    var savedBookDto = bookService.save(bookDto);
+
+    savedBookDto.setTitle("UPDATED TITLE");
+    var bookJson = objectMapper.writeValueAsString(savedBookDto);
 
     mockMvc
         .perform(
-            put("/books/{id}", bookDto.getId())
+            put("/books/{id}", savedBookDto.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bookJson))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.title").value("UPDATED TITLE"));
   }
 
   @Test
   void testThatFullUpdate_UpdatesExistingBook() throws Exception {
-    var bookEntity = TestDataUtil.createSingleTestBookEntity();
-    var savedBook = bookService.save(bookEntity);
+    var initialBookDto = TestDataUtil.createSingleTestBookDto();
+    var savedBookDto = bookService.save(initialBookDto);
+    var updatedBookDto = TestDataUtil.createListOfTestBookDto().get(1);
+    updatedBookDto.setId(savedBookDto.getId());
 
-    var bookEntityToUpdate = TestDataUtil.createListOfTestBookEntities().get(1);
-    var bookDto = bookModelMapper.mapFrom(bookEntityToUpdate);
-    bookDto.setId(savedBook.getId());
-
-    String bookJson = objectMapper.writeValueAsString(bookDto);
+    var bookJson = objectMapper.writeValueAsString(updatedBookDto);
 
     mockMvc
         .perform(
-            put("/books/{id}", savedBook.getId())
+            put("/books/{id}", savedBookDto.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bookJson))
-        .andExpect(jsonPath("$.id").value(bookDto.getId()))
-        .andExpect(jsonPath("$.bookAuthor").value(bookDto.getBookAuthor()))
-        .andExpect(jsonPath("$.title").value(bookDto.getTitle()))
-        .andExpect(jsonPath("$.isbn").value(bookDto.getIsbn()))
-        .andExpect(jsonPath("$.stock").value(bookDto.getStock()));
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(updatedBookDto.getId()))
+        .andExpect(jsonPath("$.bookAuthor").value(updatedBookDto.getBookAuthor()))
+        .andExpect(jsonPath("$.title").value(updatedBookDto.getTitle()))
+        .andExpect(jsonPath("$.isbn").value(updatedBookDto.getIsbn()))
+        .andExpect(jsonPath("$.stock").value(updatedBookDto.getStock()));
   }
 
   @Test
@@ -175,21 +171,19 @@ class BookControllerIntegrationTests {
   @Test
   void testThatDeleteBook_ReturnsHttpStatus204_ForExistingBook() throws Exception {
     var bookEntity = TestDataUtil.createSingleTestBookEntity();
-    var savedBook = bookService.save(bookEntity);
+    var bookDto = bookMapper.convertEntityToDto(bookEntity);
+    var savedBookDto = bookService.save(bookDto);
 
     mockMvc
-        .perform(delete("/books/{id}", savedBook.getId()).contentType(MediaType.APPLICATION_JSON))
+        .perform(
+            delete("/books/{id}", savedBookDto.getId()).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
   }
 
-  */
-/* OLDER TESTS *//*
-
-
   @Test
   void testCreateBook_ReturnsCreated() throws Exception {
-    var bookDto = bookModelMapper.mapFrom(TestDataUtil.createSingleTestBookEntity());
-    String json = objectMapper.writeValueAsString(bookDto);
+    var bookDto = TestDataUtil.createSingleTestBookDto();
+    var json = objectMapper.writeValueAsString(bookDto);
 
     mockMvc
         .perform(post("/books").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -200,19 +194,20 @@ class BookControllerIntegrationTests {
 
   @Test
   void testGetBookById_ReturnsBookDetails() throws Exception {
-    var book = TestDataUtil.createSingleTestBookEntity();
-    var savedBook = bookService.save(book);
+    var bookEntity = TestDataUtil.createSingleTestBookEntity();
+    var bookDto = bookMapper.convertEntityToDto(bookEntity);
+    var savedBookDto = bookService.save(bookDto);
 
     mockMvc
-        .perform(get("/books/{id}", savedBook.getId()).contentType(MediaType.APPLICATION_JSON))
+        .perform(get("/books/{id}", savedBookDto.getId()).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(savedBook.getId()))
-        .andExpect(jsonPath("$.title").value(book.getTitle()));
+        .andExpect(jsonPath("$.id").value(savedBookDto.getId()))
+        .andExpect(jsonPath("$.title").value(bookEntity.getTitle()));
   }
 
   @Test
   void testGetAllBooks_ReturnsBooks() throws Exception {
-    TestDataUtil.createListOfTestBookEntities().forEach(bookService::save);
+    TestDataUtil.createListOfTestBookDto().forEach(bookService::save);
 
     mockMvc
         .perform(
@@ -228,16 +223,16 @@ class BookControllerIntegrationTests {
 
   @Test
   void testUpdateBook_UpdatesCorrectly() throws Exception {
-    var book = TestDataUtil.createSingleTestBookEntity();
-    var savedBook = bookService.save(book);
+    var bookEntity = TestDataUtil.createSingleTestBookEntity();
+    var bookDto = bookMapper.convertEntityToDto(bookEntity);
+    var savedBookDto = bookService.save(bookDto);
 
-    var bookDto = bookModelMapper.mapFrom(book);
     bookDto.setTitle("UPDATED");
-    String bookJson = objectMapper.writeValueAsString(bookDto);
+    var bookJson = objectMapper.writeValueAsString(bookDto);
 
     mockMvc
         .perform(
-            put("/books/{id}", savedBook.getId())
+            put("/books/{id}", savedBookDto.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bookJson))
         .andExpect(status().isOk())
@@ -246,11 +241,13 @@ class BookControllerIntegrationTests {
 
   @Test
   void testDeleteBook_ReturnsNoContent() throws Exception {
-    var book = TestDataUtil.createSingleTestBookEntity();
-    var savedBook = bookService.save(book);
+    var bookEntity = TestDataUtil.createSingleTestBookEntity();
+    var bookDto = bookMapper.convertEntityToDto(bookEntity);
+    var savedBookDto = bookService.save(bookDto);
 
     mockMvc
-        .perform(delete("/books/{id}", savedBook.getId()).contentType(MediaType.APPLICATION_JSON))
+        .perform(
+            delete("/books/{id}", savedBookDto.getId()).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
   }
 
@@ -261,4 +258,3 @@ class BookControllerIntegrationTests {
         .andExpect(status().isNotFound());
   }
 }
-*/
