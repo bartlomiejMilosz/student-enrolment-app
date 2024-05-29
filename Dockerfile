@@ -1,17 +1,19 @@
-# Start with a base image containing Java runtime
-FROM openjdk:17-alpine
-
-# Add Maintainer Info
+# Build stage for Maven build
+FROM amazoncorretto:17-alpine3.19 AS build
 LABEL maintainer="Bart Milo"
+WORKDIR /app
+COPY . /app
+# Install Maven and dependencies
+RUN apk --no-cache add maven && \
+    mvn dependency:go-offline
+RUN mvn clean install
 
-# Make port 8080 available to the world outside this container
-EXPOSE 8080
-
-# The application's jar file
-ARG JAR_FILE=target/app-0.0.1-SNAPSHOT.jar
-
-# Add the application's jar to the container
-ADD ${JAR_FILE} student-enrolment-app.jar
-
-# Run the jar file 
-ENTRYPOINT ["java","-jar","/student-enrolment-app.jar"]
+# Runtime stage
+FROM amazoncorretto:17-alpine3.19
+LABEL maintainer="Bart Milo"
+ENV LANG=C.UTF-8 \
+    JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto \
+    PATH=$PATH:/usr/lib/jvm/java-17-amazon-corretto/bin
+WORKDIR /app
+COPY --from=build /app/target/app-0.0.1-SNAPSHOT.jar /app/student-enrolment-app.jar
+ENTRYPOINT ["java", "-jar", "student-enrolment-app.jar"]
