@@ -56,7 +56,7 @@ public class BookController {
     URI location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
-            .buildAndExpand(savedBookDto.id())
+            .buildAndExpand(savedBookDto.getId())
             .toUri();
     LOGGER.info("Book created successfully: {}", savedBookDto);
     var bookResponse = bookMapper.convertDtoToResponse(savedBookDto);
