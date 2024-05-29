@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BookServiceImpl implements BookService {
+
+  public static final String BOOK_NOT_FOUND_WITH_ID = "Book not found with ID: ";
   private static final Logger LOGGER = LoggerFactory.getLogger(BookServiceImpl.class);
   private final BookRepository bookRepository;
   private final BookMapper bookMapper;
@@ -21,6 +23,17 @@ public class BookServiceImpl implements BookService {
   public BookServiceImpl(BookRepository bookRepository, BookMapper bookMapper) {
     this.bookRepository = bookRepository;
     this.bookMapper = bookMapper;
+  }
+
+  private static void checkBookStock(Long bookId, int amount, BookEntity bookEntity) {
+    if (bookEntity.getStock() <= 0) {
+      LOGGER.error("Book stock unavailable for book ID: {}", bookId);
+      throw new IllegalArgumentException("Book is not available for rent.");
+    }
+
+    if (bookEntity.getStock() < amount) {
+      throw new IllegalArgumentException("Insufficient book stock.");
+    }
   }
 
   @Override
@@ -47,7 +60,7 @@ public class BookServiceImpl implements BookService {
     return bookRepository
         .findById(id)
         .map(bookMapper::convertEntityToDto)
-        .orElseThrow(() -> new BookNotFoundException("Book not found with ID: " + id));
+        .orElseThrow(() -> new BookNotFoundException(BOOK_NOT_FOUND_WITH_ID + id));
   }
 
   @Override
@@ -64,7 +77,7 @@ public class BookServiceImpl implements BookService {
     return bookRepository
         .findById(id)
         .map(existingBook -> updateExistingBook(bookDto, existingBook))
-        .orElseThrow(() -> new BookNotFoundException("Book not found with ID: " + id));
+        .orElseThrow(() -> new BookNotFoundException(BOOK_NOT_FOUND_WITH_ID + id));
   }
 
   @Override
@@ -74,23 +87,61 @@ public class BookServiceImpl implements BookService {
     bookRepository.deleteById(id);
   }
 
+  @Override
+  @Transactional
+  public BookDto decrementBookStock(Long bookId, int amount) {
+    var bookEntity =
+        bookRepository
+            .findById(bookId)
+            .orElseThrow(() -> new BookNotFoundException(BOOK_NOT_FOUND_WITH_ID + bookId));
+    checkBookStock(bookId, amount, bookEntity);
+    bookEntity.setStock(bookEntity.getStock() - amount);
+    var savedBookEntity = bookRepository.save(bookEntity);
+    return bookMapper.convertEntityToDto(savedBookEntity);
+  }
+
+  @Override
+  @Transactional
+  public BookDto decrementBookStock(Long bookId) {
+    return this.decrementBookStock(bookId, 1);
+  }
+
+  @Override
+  @Transactional
+  public void returnBookToStock(BookDto bookDto) {
+    var bookEntity = bookMapper.convertDtoToEntity(bookDto);
+    bookEntity.setStock(bookEntity.getStock() + 1);
+    bookRepository.save(bookEntity);
+  }
+
+  @Override
+  @Transactional
+  public void incrementBookStock(Long bookId) {
+    BookEntity book =
+        bookRepository
+            .findById(bookId)
+            .orElseThrow(() -> new BookNotFoundException("Book not found with ID: " + bookId));
+    book.setStock(book.getStock() + 1);
+    bookRepository.save(book);
+  }
+
   private BookDto updateExistingBook(BookDto bookDto, BookEntity existingBook) {
     LOGGER.info("Found book to update: {}", existingBook);
 
-    if (bookDto.bookAuthor() != null) {
-      existingBook.setBookAuthor(bookDto.bookAuthor());
+    if (bookDto.getBookAuthor() != null) {
+      existingBook.setBookAuthor(bookDto.getBookAuthor());
     }
-    if (bookDto.title() != null) {
-      existingBook.setTitle(bookDto.title());
+    if (bookDto.getTitle() != null) {
+      existingBook.setTitle(bookDto.getTitle());
     }
-    if (bookDto.isbn() != null) {
-      existingBook.setIsbn(bookDto.isbn());
+    if (bookDto.getIsbn() != null) {
+      existingBook.setIsbn(bookDto.getIsbn());
     }
-    if (bookDto.createdAt() != null) {
-      existingBook.setCreatedAt(bookDto.createdAt());
+    if (bookDto.getCreatedAt() != null) {
+      existingBook.setCreatedAt(bookDto.getCreatedAt());
     }
-    if (bookDto.stock() != null) {
-      existingBook.setStock(bookDto.stock());
+    if (bookDto.getStock() != null) {
+      existingBook.setStock(bookDto.getStock());
     }
 
     var updatedBook = bookRepository.save(existingBook);
