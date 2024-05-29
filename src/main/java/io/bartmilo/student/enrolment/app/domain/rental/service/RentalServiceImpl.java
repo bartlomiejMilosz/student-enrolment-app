@@ -1,8 +1,8 @@
 package io.bartmilo.student.enrolment.app.domain.rental.service;
 
 import io.bartmilo.student.enrolment.app.domain.book.mapper.BookMapper;
-import io.bartmilo.student.enrolment.app.domain.book.model.BookDto;
 import io.bartmilo.student.enrolment.app.domain.book.service.BookService;
+import io.bartmilo.student.enrolment.app.domain.rental.exception.RentalNotFoundException;
 import io.bartmilo.student.enrolment.app.domain.rental.mapper.RentalMapper;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalDto;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalEntity;
@@ -10,7 +10,6 @@ import io.bartmilo.student.enrolment.app.domain.rental.repository.RentalReposito
 import io.bartmilo.student.enrolment.app.domain.student.mapper.StudentMapper;
 import io.bartmilo.student.enrolment.app.domain.student.model.IdCardStatus;
 import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,49 +50,23 @@ public class RentalServiceImpl implements RentalService {
         bookId,
         studentId,
         dueDate);
-    var studentDto = studentService.findById(studentId);
-    LOGGER.info("Student details retrieved: {}", studentDto);
 
-    // Check the status of the student's ID card
-    if (studentDto.studentIdCardDto() == null
-        || studentDto.studentIdCardDto().status() != IdCardStatus.ACTIVE) {
-      LOGGER.warn("Attempt to rent with inactive ID card by student ID: {}", studentId);
+    var bookDto = bookService.decrementBookStock(bookId);
+    var studentDto = studentService.findById(studentId);
+    if (studentDto.studentIdCardDto().status() != IdCardStatus.ACTIVE) {
       throw new IllegalStateException("Student's ID card is not active.");
     }
 
-    var bookDto = bookService.findById(bookId);
-    LOGGER.info("Book details retrieved: {}", bookDto);
-
-    if (bookDto.stock() == null || bookDto.stock() <= 0) {
-      LOGGER.error("Book stock unavailable for book ID: {}", bookId);
-      throw new IllegalArgumentException("Book is not available for rent.");
-    }
-
-    var rentedBookDto =
-        new BookDto(
-            bookDto.id(),
-            bookDto.bookAuthor(),
-            bookDto.title(),
-            bookDto.isbn(),
-            bookDto.createdAt(),
-            bookDto.stock() - 1);
-    bookService.save(rentedBookDto); // Save the updated book stock
-    LOGGER.info("Updated book stock for book ID: {}. New stock: {}", bookId, rentedBookDto.stock());
-
-    var rentedBookEntity = bookMapper.convertDtoToEntity(rentedBookDto);
-    var studentEntity = studentMapper.convertDtoToEntity(studentDto);
-
-    var rentalEntity = new RentalEntity();
-    rentalEntity.setRentedAt(LocalDateTime.now());
-    rentalEntity.setBookEntity(rentedBookEntity);
-    rentalEntity.setStudentEntity(studentEntity);
-    rentalEntity.setDueDate(dueDate);
-    LOGGER.info("Created rental record: {}", rentalEntity);
-
-    LOGGER.info("Saving rental to the database.");
-
-    var savedRentalEntity = rentalRepository.save(rentalEntity);
-    return rentalMapper.convertEntityToDto(savedRentalEntity);
+    var rentalEntity =
+        RentalEntity.builder()
+            .rentedAt(LocalDateTime.now())
+            .dueDate(dueDate)
+            .bookEntity(bookMapper.convertDtoToEntity(bookDto))
+            .studentEntity(studentMapper.convertDtoToEntity(studentDto))
+            .build();
+    rentalRepository.save(rentalEntity);
+    LOGGER.info("Rental saved: {}", rentalEntity);
+    return rentalMapper.convertEntityToDto(rentalEntity);
   }
 
   @Override
@@ -103,25 +76,15 @@ public class RentalServiceImpl implements RentalService {
         rentalRepository
             .findById(rentalId)
             .orElseThrow(
-                () -> new EntityNotFoundException("Rental not found with ID: " + rentalId));
+                () -> new RentalNotFoundException("Rental not found with ID: " + rentalId));
 
     if (rentalEntity.getReturnedAt() != null) {
       throw new IllegalStateException("This book has already been returned.");
     }
 
-    var bookEntity = rentalEntity.getBookEntity();
-    var returnedBookDto =
-        new BookDto(
-            bookEntity.getId(),
-            bookEntity.getBookAuthor(),
-            bookEntity.getTitle(),
-            bookEntity.getIsbn(),
-            bookEntity.getCreatedAt(),
-            bookEntity.getStock() + 1);
-
-    bookService.save(returnedBookDto);
-
     rentalEntity.setReturnedAt(LocalDateTime.now());
+    var returnedBookId = rentalEntity.getBookEntity().getId();
+    bookService.incrementBookStock(returnedBookId);
     rentalRepository.save(rentalEntity);
 
     LOGGER.info("Book returned successfully: {}", rentalEntity);
