@@ -180,17 +180,13 @@ class BookServiceUnitTests {
     var bookEntity = new BookEntity();
     bookEntity.setId(bookId);
     bookEntity.setStock(10);
-
-    // When
     when(bookRepositoryMock.findById(bookId)).thenReturn(Optional.of(bookEntity));
     when(bookRepositoryMock.save(any(BookEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-    // Act
     bookService.decrementBookStock(bookId);
 
-    // Then
     verify(bookRepositoryMock).save(bookEntityArgumentCaptor.capture());
-    BookEntity capturedBook = bookEntityArgumentCaptor.getValue();
+    var capturedBook = bookEntityArgumentCaptor.getValue();
     assertEquals(9, capturedBook.getStock(), "The stock should be decremented by 1");
   }
 

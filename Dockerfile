@@ -1,4 +1,3 @@
-# Build stage for Maven build
 FROM amazoncorretto:17-alpine3.19 AS build
 LABEL maintainer="Bart Milo"
 WORKDIR /app

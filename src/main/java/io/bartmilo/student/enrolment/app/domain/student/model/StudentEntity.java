@@ -47,6 +47,6 @@ public class StudentEntity {
       cascade = CascadeType.MERGE)
   private StudentIdCardEntity studentIdCardEntity;
 
-  @OneToMany(mappedBy = "studentEntity", orphanRemoval = true)
+  @OneToMany(mappedBy = "studentEntity", orphanRemoval = false)
   private List<RentalEntity> rentalEntityList = new ArrayList<>();
 }

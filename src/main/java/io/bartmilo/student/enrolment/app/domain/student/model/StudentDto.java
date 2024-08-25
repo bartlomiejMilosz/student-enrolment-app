@@ -3,6 +3,7 @@ package io.bartmilo.student.enrolment.app.domain.student.model;
 import io.bartmilo.student.enrolment.app.domain.book.model.BookDto;
 import java.util.List;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Builder
 public record StudentDto(

@@ -1,19 +1,16 @@
-/*
 package io.bartmilo.student.enrolment.app.domain.rental;
 
-import static java.time.LocalDateTime.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.bartmilo.student.enrolment.app.TestDataUtil;
-import io.bartmilo.student.enrolment.app.domain.book.repository.BookRepository;
-import io.bartmilo.student.enrolment.app.domain.rental.model.RentalDto;
-import io.bartmilo.student.enrolment.app.domain.rental.model.RentalEntity;
-import io.bartmilo.student.enrolment.app.domain.rental.repository.RentalRepository;
+import io.bartmilo.student.enrolment.app.domain.book.service.BookService;
+import io.bartmilo.student.enrolment.app.domain.rental.model.RentalRequest;
+import io.bartmilo.student.enrolment.app.domain.rental.model.RentalResponse;
 import io.bartmilo.student.enrolment.app.domain.rental.service.RentalService;
 import io.bartmilo.student.enrolment.app.domain.student.service.StudentService;
-import io.bartmilo.student.enrolment.app.util.DomainMapper;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,48 +33,65 @@ class RentalControllerIntegrationTests {
 
   @Autowired private RentalService rentalService;
 
-  @Autowired private RentalRepository rentalRepository;
-
   @Autowired private StudentService studentService;
 
-  @Autowired private BookRepository bookRepository;
-
-  @Autowired private DomainMapper<RentalEntity, RentalDto> rentalModelMapper;
+  @Autowired private BookService bookService;
 
   @Test
   void testRentBook_ReturnsCreatedAndRentalDetails() throws Exception {
-    var book = TestDataUtil.createSingleTestBookEntity();
-    bookRepository.save(book);
-    var student = TestDataUtil.createSingleTestStudentEntity();
-    studentService.save(student);
-    var rentalDto =
-        RentalDto.builder().bookId(1L).studentId(1L).dueDate(now().plusDays(30)).build();
+    var studentDto = TestDataUtil.createSingleTestStudentDto();
+    var savedStudentDto = studentService.save(studentDto);
+    var bookDto = TestDataUtil.createSingleTestBookDto();
+    var savedBookDto = bookService.save(bookDto);
 
-    String rentalJson = objectMapper.writeValueAsString(rentalDto);
+    var rentalRequest =
+        RentalRequest.builder()
+            .bookId(savedBookDto.getId())
+            .studentId(savedStudentDto.id())
+            .dueDate(LocalDateTime.now().plusDays(30))
+            .build();
+
+    var rentalRequestJson = objectMapper.writeValueAsString(rentalRequest);
 
     mockMvc
-        .perform(post("/rentals").contentType(MediaType.APPLICATION_JSON).content(rentalJson))
+        .perform(
+            post("/rentals").contentType(MediaType.APPLICATION_JSON).content(rentalRequestJson))
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.studentId").value(rentalDto.getStudentId()))
-        .andExpect(jsonPath("$.bookId").value(rentalDto.getBookId()))
-        .andExpect(jsonPath("$.dueDate").exists()); // Check the due date was set correctly
+        .andExpect(jsonPath("$.studentId").value(rentalRequest.studentId()))
+        .andExpect(jsonPath("$.bookId").value(rentalRequest.bookId()))
+        .andExpect(jsonPath("$.dueDate").exists());
   }
 
   @Test
   void testReturnBook_ReturnsOkAndUpdatedRentalDetails() throws Exception {
-    var rental =
-        RentalEntity.builder()
-            .id(1L)
-            .bookEntity(TestDataUtil.createSingleTestBookEntity())
-            .rentedAt(now().minusDays(10))
-            .dueDate(now().plusDays(30))
+    var studentDto = TestDataUtil.createSingleTestStudentDto();
+    var savedStudentDto = studentService.save(studentDto);
+    var bookDto = TestDataUtil.createSingleTestBookDto();
+    var savedBookDto = bookService.save(bookDto);
+
+    var rentalRequest =
+        RentalRequest.builder()
+            .bookId(savedBookDto.getId())
+            .studentId(savedStudentDto.id())
+            .dueDate(LocalDateTime.now().plusDays(30))
             .build();
-    rentalRepository.save(rental);
+
+    var rentalRequestJson = objectMapper.writeValueAsString(rentalRequest);
+
+    var rentalResponseJson =
+        mockMvc
+            .perform(
+                post("/rentals").contentType(MediaType.APPLICATION_JSON).content(rentalRequestJson))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var rentalResponse = objectMapper.readValue(rentalResponseJson, RentalResponse.class);
 
     mockMvc
-        .perform(put("/rentals/{id}", rental.getId()).contentType(MediaType.APPLICATION_JSON))
+        .perform(put("/rentals/{id}", rentalResponse.id()).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.returnedAt").exists()); // Confirm the returned date is now set
+        .andExpect(jsonPath("$.returnedAt").exists());
   }
 }
-*/

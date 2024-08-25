@@ -4,7 +4,6 @@ import io.bartmilo.student.enrolment.app.domain.rental.mapper.RentalMapper;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalRequest;
 import io.bartmilo.student.enrolment.app.domain.rental.model.RentalResponse;
 import io.bartmilo.student.enrolment.app.domain.rental.service.RentalService;
-import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

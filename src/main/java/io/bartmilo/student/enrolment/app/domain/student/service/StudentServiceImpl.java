@@ -39,7 +39,7 @@ public class StudentServiceImpl implements StudentService {
   @Transactional
   public StudentDto save(StudentDto studentDto) {
     var studentEntity = studentMapper.convertDtoToEntity(studentDto);
-    studentEntity = studentRepository.saveAndFlush(studentEntity);
+    studentEntity = studentRepository.save(studentEntity);
 
     var savedStudentDto = studentMapper.convertEntityToDto(studentEntity);
     var studentIdCardDto = studentIdCardService.generateStudentIdCard(savedStudentDto);
@@ -50,7 +50,6 @@ public class StudentServiceImpl implements StudentService {
     // Update the student entity with the student card information
     studentEntity.setStudentIdCardEntity(studentIdCardEntity);
     studentRepository.save(studentEntity);
-
     return studentMapper.convertEntityToDto(studentEntity);
   }
 
